@@ -1,0 +1,24 @@
+log:
+  writers: file,stdout
+  logger_level: DEBUG
+  logger_file: log
+  log_format_text: false
+  rollingPolicy: size
+  log_rotate_date: 1
+  log_rotate_size: 1
+  log_backup_count: 7
+addr: ":8080"
+
+rabbitmq:
+  username: "admin"
+  password: "hhxx.ttxs"
+  addr: "120.78.82.47:5672"
+  producer:
+    exchange: "micro-platform.fanout"
+    kind: "topic"
+    queue: "micro-platform.control-center"
+  consumer:
+    queue: "micro-platform.a"
+heart_beat:
+    ip: "120.78.82.47"
+    queue: "micro-platform.a"
