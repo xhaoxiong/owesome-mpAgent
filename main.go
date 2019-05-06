@@ -7,7 +7,9 @@ package main
 
 import (
 	"fmt"
+	"github.com/spf13/cast"
 	"github.com/spf13/pflag"
+	"github.com/tidwall/gjson"
 	"mpAgent/config"
 	"mpAgent/service"
 )
@@ -25,12 +27,14 @@ func main() {
 	cmd := service.NewCommand()
 	mq := service.NewRabbitMq()
 
-	mq.Publish(service.HeartBeat())
+	mq.Publish(service.HeartBeatTest())
 
 	go func() {
 		for {
 			if data := mq.Consumer(); data != nil {
-				fmt.Println(string(data))
+				var t interface{}
+				gjson.Unmarshal(data, &t)
+				data = []byte(cast.ToString(t))
 				cmd.Recv <- data
 				cmd.Start()
 			}

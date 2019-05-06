@@ -32,14 +32,17 @@ type Result struct {
 type HeartBeatResult struct {
 	Action string
 	Data   struct {
-		Ip          string   `json:"Ip"`
-		Queue       string   `json:"Queue"`
+		Ip          string   `json:"ip"`
+		Queue       string   `json:"queue"`
 		Alias       string   `json:"alias"`
 		User        string   `json:"user"`
 		Passwd      string   `json:"passwd"`
-		FreeCpu     int64    `json:"freeCpu"`
-		FreeMem     int64    `json:"freeMem"`
-		FreeDisk    int64    `json:"freeDisk"`
+		FreeCpu     float64  `json:"freeCpu"`
+		CpuInfo     string   `json:"cpuInfo"`
+		FreeMem     int      `json:"freeMem"`
+		MemInfo     string   `json:"memInfo"`
+		FreeDisk    int      `json:"freeDisk"`
+		DiskInfo    string   `json:"diskInfo"`
 		MachineType []string `json:"machineType"`
 	}
 }

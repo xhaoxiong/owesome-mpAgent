@@ -22,3 +22,6 @@ rabbitmq:
 heart_beat:
   ip: "120.78.82.47"
   queue: "micro-platform.a"
+  user: "root"
+  password: "ldp.851817"
+  machine_type: ["compile","deploy"]
