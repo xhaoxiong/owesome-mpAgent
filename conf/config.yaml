@@ -14,11 +14,11 @@ rabbitmq:
   password: "hhxx.ttxs"
   addr: "120.78.82.47:5672"
   producer:
-    exchange: "micro-platform.fanout"
+    exchange: "micro-platform.topic"
     kind: "topic"
     queue: "micro-platform.control-center"
   consumer:
     queue: "micro-platform.a"
 heart_beat:
-    ip: "120.78.82.47"
-    queue: "micro-platform.a"
+  ip: "120.78.82.47"
+  queue: "micro-platform.a"

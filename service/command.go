@@ -6,6 +6,8 @@
 package service
 
 import (
+	"fmt"
+	"github.com/spf13/cast"
 	"github.com/tidwall/gjson"
 )
 
@@ -25,7 +27,16 @@ func NewCommand() *Command {
 func (c *Command) Start() {
 	data := <-c.Recv
 
+	var t interface{}
+
+	gjson.Unmarshal(data, &t)
+	data = []byte(cast.ToString(t))
+
 	actionKey := gjson.GetBytes(data, "action").String()
+	cmds := gjson.GetBytes(data, "cmds").Array()
+
+	fmt.Println("cmds:", cmds)
+	fmt.Println("key:", actionKey)
 	if callback, ok := ActionMap[actionKey]; ok {
 		callback(c, data)
 	}

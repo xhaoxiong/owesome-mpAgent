@@ -8,7 +8,6 @@ package service
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/spf13/cast"
 	"github.com/tidwall/gjson"
@@ -17,6 +16,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"time"
 )
 
 func Build(c *Command, data []byte) {
@@ -57,12 +57,12 @@ func Build(c *Command, data []byte) {
 		splits := strings.Split(cmdStr, " ")
 		fmt.Println("开始执行命令...")
 		if result, err := Excute(splits[0], splits[1:], dir); err != nil {
-			returnResult := ReturnResult(index, taskId, -1, "执行第"+cast.ToString(index+1)+"条命令失败")
+			returnResult := ReturnResult(index, taskId, -1, "执行第"+cast.ToString(index+1)+"条命令失败:"+cast.ToString(err))
 			fmt.Println("发送结果到消息队列...")
 			c.Send <- returnResult
 
 		} else {
-			returnResult := ReturnResult(index, taskId, -1, string(result))
+			returnResult := ReturnResult(index, taskId, 0, string(result))
 			fmt.Println("发送成功的结果到消息队列...")
 			c.Send <- returnResult
 		}
@@ -105,7 +105,7 @@ func Excute(name string, cmds []string, dir string) (data []byte, err error) {
 	cmd.Stdout = &stdout
 
 	if err := cmd.Run(); err != nil {
-		return nil, errors.New("执行命令失败")
+		return nil, err
 	} else {
 		return stdout.Bytes(), nil
 	}
@@ -114,11 +114,12 @@ func Excute(name string, cmds []string, dir string) (data []byte, err error) {
 func ReturnResult(index int, taskId string, code int, msg string) []byte {
 	var cmdResult models.Result
 	cmdResult.Action = "ack"
-	cmdResult.SerialId = index + 1
-	cmdResult.Cmd = "第" + cast.ToString(index+1) + "条shell命令"
-	cmdResult.TaskId = taskId
+	cmdResult.Resp.SerialNo = index + 1
+	cmdResult.Resp.Cmd = "第" + cast.ToString(index+1) + "条shell命令"
+	cmdResult.Resp.TaskId = taskId
 	cmdResult.Resp.Msg = msg
 	cmdResult.Resp.Code = code
+	cmdResult.Resp.TimeStamp = time.Now().Unix()
 	bytes, _ := json.Marshal(cmdResult)
 	return bytes
 }
