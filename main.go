@@ -26,7 +26,6 @@ func main() {
 	}
 	cmd := service.NewCommand()
 	mq := service.NewRabbitMq()
-
 	go service.HeartBeatTicker(mq)
 	go func() {
 		for {

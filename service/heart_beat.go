@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"github.com/spf13/viper"
 	"mpAgent/models"
+	"time"
 )
 
 func HeartBeatTest() []byte {
@@ -34,5 +35,5 @@ func HeartBeatTest() []byte {
 }
 
 func HeartBeatRecv(c *Command, data []byte) {
-	fmt.Println(string(data))
+	fmt.Println(time.Now().String() + ":" + string(data))
 }

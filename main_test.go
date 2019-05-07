@@ -23,6 +23,7 @@ func TestA(t *testing.T) {
 		panic(err)
 	}
 	t.Log(service.CPUCheck())
+	t.Log(service.FreeCPU())
 	t.Log(service.DiskCheck())
 	t.Log(service.RAMCheck())
 	t.Log(viper.GetStringSlice("heart_beat.machine_type"))
