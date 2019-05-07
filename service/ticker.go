@@ -6,13 +6,12 @@
 package service
 
 import (
-	"github.com/spf13/viper"
 	"time"
 )
 
 func HeartBeatTicker(mq *RabbitMq) {
 	for {
 		mq.Publish(HeartBeatTest())
-		time.Sleep(time.Duration(viper.GetDuration("heartbeat.ticker_time") * time.Second))
+		time.Sleep(60 * time.Second)
 	}
 }
