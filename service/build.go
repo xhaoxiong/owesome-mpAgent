@@ -32,6 +32,7 @@ func Build(c *Command, data []byte) {
 
 	Options = strings.Replace(Options, "$HOST", os.Getenv("HOST"), -1)
 	Options = strings.Replace(Options, "$REGISTER_CENTER", os.Getenv("REGISTER_CENTER"), -1)
+	Options = strings.Replace(Options, "$port", Port, -1)
 
 	if !util.Exists(workDir) {
 		os.MkdirAll(workDir, 0755)
@@ -39,38 +40,50 @@ func Build(c *Command, data []byte) {
 	cmds := gjson.GetBytes(data, "cmds").Array()
 	taskId := gjson.GetBytes(data, "taskId").String()
 
-	fmt.Println("repoUrl:", repoUrl)
-	fmt.Println("serviceName:", serviceName)
-	fmt.Println("profile:", Profile)
-	fmt.Println("version:", Version)
-	fmt.Println("port:", Port)
-	fmt.Println("options:", Options)
-	fmt.Println("workdir:", workDir)
-
 	fmt.Println("开始遍历cmds...")
 	for index := range cmds {
 		dir := cmds[index].Get("dir").String()
 		cmdStr := cmds[index].Get("cmd").String()
 
 		dir = strings.Replace(dir, "$work_dir", workDir, -1)
-		cmdStr = ReplaceStr(cmdStr, repoUrl, serviceName, Profile, Version, Port, Options)
+		dir = strings.Replace(dir, "$service_name", serviceName, -1)
+		if !util.Exists(dir) {
+			os.MkdirAll(dir, 0755)
+		}
+		cmdStr = ReplaceStr(cmdStr, repoUrl, serviceName, Profile, Version, Port, Options, workDir)
 		splits := strings.Split(cmdStr, " ")
-		fmt.Println("开始执行命令...")
 		if result, err := Excute(splits[0], splits[1:], dir); err != nil {
-			returnResult := ReturnResult(index, taskId, -1, "执行第"+cast.ToString(index+1)+"条命令失败:"+cast.ToString(err))
-			fmt.Println("发送结果到消息队列...")
+			returnResult := ReturnResult(index, taskId, -1, cast.ToString(err), cmdStr)
+
 			c.Send <- returnResult
 
 		} else {
-			returnResult := ReturnResult(index, taskId, 0, string(result))
-			fmt.Println("发送成功的结果到消息队列...")
+			returnResult := ReturnResult(index, taskId, 0, string(result), cmdStr)
 			c.Send <- returnResult
 		}
 	}
+	fmt.Println("遍历cmds完成...")
+	c.Send <- ReturnEnd(taskId)
 
 }
+func Excute(name string, cmds []string, dir string) (data []byte, err error) {
+	var stdout bytes.Buffer
 
-func ReplaceStr(cmdStr, repoUrl, serviceName, Profile, Version, Port, Options string) string {
+	cmd := exec.Command(name, cmds...)
+	cmd.Dir = dir
+
+	cmd.Stdout = &stdout
+
+	if err := cmd.Start(); err != nil {
+		return nil, err
+	}
+	if err := cmd.Wait(); err != nil {
+		return nil, err
+	}
+	return stdout.Bytes(), nil
+}
+
+func ReplaceStr(cmdStr, repoUrl, serviceName, Profile, Version, Port, Options, workDir string) string {
 	if strings.Contains(cmdStr, "$repo_url") {
 		cmdStr = strings.Replace(cmdStr, "$repo_url", repoUrl, -1)
 	}
@@ -93,33 +106,32 @@ func ReplaceStr(cmdStr, repoUrl, serviceName, Profile, Version, Port, Options st
 	if strings.Contains(cmdStr, "$options") {
 		cmdStr = strings.Replace(cmdStr, "$options", Options, -1)
 	}
+
+	if strings.Contains(cmdStr, "$work_dir") {
+		cmdStr = strings.Replace(cmdStr, "$work_dir", workDir, -1)
+	}
 	return cmdStr
 }
 
-func Excute(name string, cmds []string, dir string) (data []byte, err error) {
-	var stdout bytes.Buffer
-
-	cmd := exec.Command(name, cmds...)
-	cmd.Dir = dir
-
-	cmd.Stdout = &stdout
-
-	if err := cmd.Run(); err != nil {
-		return nil, err
-	} else {
-		return stdout.Bytes(), nil
-	}
-}
-
-func ReturnResult(index int, taskId string, code int, msg string) []byte {
+func ReturnResult(index int, taskId string, code int, msg string, cmdStr string) []byte {
 	var cmdResult models.Result
 	cmdResult.Action = "ack"
 	cmdResult.Data.SerialNo = index + 1
-	cmdResult.Data.Cmd = "第" + cast.ToString(index+1) + "条shell命令"
+	cmdResult.Data.Cmd = cmdStr
 	cmdResult.Data.TaskId = taskId
 	cmdResult.Data.Msg = msg
 	cmdResult.Data.Code = code
 	cmdResult.Data.TimeStamp = time.Now().Unix()
+	bytes, _ := json.Marshal(cmdResult)
+	return bytes
+}
+
+func ReturnEnd(taskId string) []byte {
+	var cmdResult models.Result
+	cmdResult.Data.Code = 10000
+	cmdResult.Data.TimeStamp = time.Now().Unix()
+	cmdResult.Data.TaskId = taskId
+	cmdResult.Action = "ack"
 	bytes, _ := json.Marshal(cmdResult)
 	return bytes
 }

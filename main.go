@@ -44,7 +44,6 @@ func main() {
 
 	go func() {
 		for {
-			fmt.Println("在发送")
 			if data, ok := <-cmd.Send; ok {
 				fmt.Println(string(data))
 				if data != nil {

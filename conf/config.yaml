@@ -24,5 +24,5 @@ heart_beat:
   queue: "micro-platform.a"
   user: "root"
   password: "ldp.851817"
-  machine_type: ["compile","deploy"]
+  machine_type: ["build","deploy"]
   alias: "ALY-001"

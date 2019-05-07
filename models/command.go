@@ -23,7 +23,7 @@ type Result struct {
 		Code      int    `json:"code"`
 		Msg       string `json:"msg"`
 		TaskId    string `json:"taskId"`
-		SerialNo  int    `json:"serialId"`
+		SerialNo  int    `json:"serialNo"`
 		Cmd       string `json:"cmd"`
 		TimeStamp int64  `json:"timestamp"`
 	} `json:"data"`
