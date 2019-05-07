@@ -26,3 +26,4 @@ heart_beat:
   password: "ldp.851817"
   machine_type: ["build","deploy"]
   alias: "ALY-001"
+  ticker_time: 60 #s
