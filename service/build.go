@@ -114,12 +114,12 @@ func Excute(name string, cmds []string, dir string) (data []byte, err error) {
 func ReturnResult(index int, taskId string, code int, msg string) []byte {
 	var cmdResult models.Result
 	cmdResult.Action = "ack"
-	cmdResult.Resp.SerialNo = index + 1
-	cmdResult.Resp.Cmd = "第" + cast.ToString(index+1) + "条shell命令"
-	cmdResult.Resp.TaskId = taskId
-	cmdResult.Resp.Msg = msg
-	cmdResult.Resp.Code = code
-	cmdResult.Resp.TimeStamp = time.Now().Unix()
+	cmdResult.Data.SerialNo = index + 1
+	cmdResult.Data.Cmd = "第" + cast.ToString(index+1) + "条shell命令"
+	cmdResult.Data.TaskId = taskId
+	cmdResult.Data.Msg = msg
+	cmdResult.Data.Code = code
+	cmdResult.Data.TimeStamp = time.Now().Unix()
 	bytes, _ := json.Marshal(cmdResult)
 	return bytes
 }

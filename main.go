@@ -28,10 +28,11 @@ func main() {
 	mq := service.NewRabbitMq()
 
 	mq.Publish(service.HeartBeatTest())
-
 	go func() {
 		for {
+
 			if data := mq.Consumer(); data != nil {
+				fmt.Println(string(data))
 				var t interface{}
 				gjson.Unmarshal(data, &t)
 				data = []byte(cast.ToString(t))
@@ -43,9 +44,12 @@ func main() {
 
 	go func() {
 		for {
+			fmt.Println("在发送")
 			if data, ok := <-cmd.Send; ok {
 				fmt.Println(string(data))
-				mq.Publish(data)
+				if data != nil {
+					mq.Publish(data)
+				}
 			}
 		}
 	}()

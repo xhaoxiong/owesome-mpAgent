@@ -25,3 +25,4 @@ heart_beat:
   user: "root"
   password: "ldp.851817"
   machine_type: ["compile","deploy"]
+  alias: "ALY-001"

@@ -51,6 +51,11 @@ func FreeDisk() int {
 	return int(u.Free) / MB
 }
 
+func TotalDisk() int {
+	u, _ := disk.Usage("/")
+	return int(u.Total) / MB
+}
+
 // CPUCheck checks the cpu usage.
 func CPUCheck() (message string) {
 	cores, _ := cpu.Counts(false)
@@ -76,6 +81,11 @@ func FreeCPU() float64 {
 	used, _ := cpu.Percent(time.Second, false)
 
 	return 100 - math.Trunc(used[0]*1e2+0.5)*1e-2
+}
+
+func CPUNum() int {
+	cores, _ := cpu.Counts(false)
+	return cores
 }
 
 // RAMCheck checks the disk usage.
@@ -105,4 +115,10 @@ func RAMCheck() (message string) {
 func FreeRAM() int {
 	u, _ := mem.VirtualMemory()
 	return int(u.Free) / MB
+}
+
+func TotalRAM() int {
+	u, _ := mem.VirtualMemory()
+	return int(u.Total) / MB
+
 }
