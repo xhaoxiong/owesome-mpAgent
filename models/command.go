@@ -45,9 +45,5 @@ type HeartBeatResult struct {
 		TotalMem  int `json:"totalMem"`
 		TotalDisk int `json:"totalDisk"`
 		CpuNum    int `json:"cpuNum"`
-
-		DiskInfo string `json:"diskInfo"`
-		MemInfo  string `json:"memInfo"`
-		CpuInfo  string `json:"cpuInfo"`
 	} `json:"data"`
 }
