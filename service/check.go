@@ -11,7 +11,6 @@ import (
 	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/load"
 	"github.com/shirou/gopsutil/mem"
-	"math"
 	"time"
 )
 
@@ -80,7 +79,7 @@ func CPUCheck() (message string) {
 func FreeCPU() float64 {
 	used, _ := cpu.Percent(time.Second, false)
 
-	return 100 - math.Trunc(used[0]*1e2+0.5)*1e-2
+	return used[0]
 }
 
 func CPUNum() int {

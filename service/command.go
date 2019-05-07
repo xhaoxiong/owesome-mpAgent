@@ -17,6 +17,7 @@ type Command struct {
 var ActionMap map[string]func(c *Command, data []byte) = map[string]func(c *Command, data []byte){
 	"build":     Build,
 	"heartbeat": HeartBeatRecv,
+	"start":     StartOrStop,
 }
 
 func NewCommand() *Command {

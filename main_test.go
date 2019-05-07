@@ -7,25 +7,15 @@
 package main
 
 import (
-	"fmt"
-	"github.com/spf13/pflag"
-	"github.com/spf13/viper"
-	"mpAgent/config"
-	"mpAgent/service"
+	"github.com/shirou/gopsutil/cpu"
 	"testing"
 	"time"
 )
 
 func TestA(t *testing.T) {
-	pflag.Parse()
 
-	if err := config.Init(*cfg); err != nil {
-		panic(err)
-	}
-	t.Log(service.CPUCheck())
-	t.Log(service.FreeCPU())
-	t.Log(service.DiskCheck())
-	t.Log(service.RAMCheck())
-	t.Log(viper.GetStringSlice("heart_beat.machine_type"))
-	fmt.Println(time.Now().Weekday())
+	used, _ := cpu.Percent(2*time.Second, false)
+
+	t.Log(used)
+
 }
